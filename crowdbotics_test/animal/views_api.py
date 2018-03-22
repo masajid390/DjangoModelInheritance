@@ -76,10 +76,11 @@ class Animal(mixins.ListModelMixin, APIView):
         except (InvalidSerializerDataException, Exception) as ex:
             return ExceptionResponse.get(ex)
 
-    def delete(self, request, pk):
+    def delete(self, request):
         try:
             query_params = request.query_params
             animal_type = query_params.get("type", None)
+            pk = query_params.get("id", None)
             if animal_type == "cat":
                 Cat.objects.get(id=pk).delete()
             elif animal_type == "dog":

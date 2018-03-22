@@ -25,7 +25,7 @@ SECRET_KEY = 'qx6&(&8(&^$eq0xd)#^mg#xfel^v-_%!9asfuz5c+23ylwrjz9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'test.foreach-software.com']
 
 
 # Application definition

@@ -1,13 +1,16 @@
 from rest_framework import mixins, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+
+from crowdbotics_test.animal.exceptions.response import ExceptionResponse
 from .serializers import CatSerializer, DogSerializer
+from .exceptions import InvalidSerializerDataException
 from .models import Cat, Dog
 
 
 class Animal(mixins.ListModelMixin, APIView):
 
-    def get(self, request, pk):
+    def get(self, request):
         try:
             query_params = request.query_params
             animal_type = query_params.get("type", None)
@@ -21,12 +24,10 @@ class Animal(mixins.ListModelMixin, APIView):
             else:
                 raise Exception("Invalid animal type")
             return Response(data=data)
-        except Exception as ex:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST, data={
-                    'code': 400, 'message': 'HTTP 400 Bad Request', 'developerMessage': str(ex)})
+        except (InvalidSerializerDataException, Exception) as ex:
+            return ExceptionResponse.get(ex)
 
-    def post(self, request, pk):
+    def post(self, request):
         try:
             query_params = request.query_params
             data = request.data
@@ -35,19 +36,21 @@ class Animal(mixins.ListModelMixin, APIView):
                 serializer = CatSerializer(data=data)
                 if serializer.is_valid():
                     serializer.save()
+                else:
+                    raise InvalidSerializerDataException("Cat", serializer.errors)
             elif animal_type == "dog":
                 serializer = DogSerializer(data=data)
                 if serializer.is_valid():
                     serializer.save()
+                else:
+                    raise InvalidSerializerDataException("Dog", serializer.errors)
             else:
                 raise Exception("Invalid animal type")
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-        except Exception as ex:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST, data={
-                    'code': 400, 'message': 'HTTP 400 Bad Request', 'developerMessage': str(ex)})
+        except (InvalidSerializerDataException, Exception) as ex:
+            return ExceptionResponse.get(ex)
 
-    def put(self, request, pk):
+    def put(self, request):
         try:
             query_params = request.query_params
             data = request.data
@@ -58,18 +61,20 @@ class Animal(mixins.ListModelMixin, APIView):
                 serializer = CatSerializer(cat, data=data)
                 if serializer.is_valid():
                     serializer.save()
+                else:
+                    raise InvalidSerializerDataException("Cat", serializer.errors)
             elif animal_type == "dog":
                 dog = Dog.objects.get(id=_id)
                 serializer = DogSerializer(dog, data=data)
                 if serializer.is_valid():
                     serializer.save()
+                else:
+                    raise InvalidSerializerDataException("Dog", serializer.errors)
             else:
                 raise Exception("Invalid animal type")
-            return Response(status=status.HTTP_200_OK)
-        except Exception as ex:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST, data={
-                    'code': 400, 'message': 'HTTP 400 Bad Request', 'developerMessage': str(ex)})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        except (InvalidSerializerDataException, Exception) as ex:
+            return ExceptionResponse.get(ex)
 
     def delete(self, request, pk):
         try:
@@ -82,7 +87,5 @@ class Animal(mixins.ListModelMixin, APIView):
             else:
                 raise Exception("Invalid animal type")
             return Response(status=status.HTTP_200_OK)
-        except Exception as ex:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST, data={
-                    'code': 400, 'message': 'HTTP 400 Bad Request', 'developerMessage': str(ex)})
+        except (InvalidSerializerDataException, Exception) as ex:
+            return ExceptionResponse.get(ex)

@@ -1,4 +1,4 @@
-#!/Users/msajid/Arslan/Development/testing/crowdbotics_test/venv/bin/python
+#!/Users/msajid/Arslan/Development/testing/DjangoModelInheritance/venv/bin/python
 # EASY-INSTALL-ENTRY-SCRIPT: 'pip==9.0.1','console_scripts','pip3'
 __requires__ = 'pip==9.0.1'
 import re
